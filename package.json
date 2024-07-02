@@ -1,0 +1,23 @@
+{
+  "name": "foresight",
+  "version": "1.0.0",
+  "description": "a tool to show Habitica dailies for specific days to make planning days in advance easier",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FurriousFox/Foresight.git"
+  },
+  "keywords": [
+    "Habitica"
+  ],
+  "author": "FurriousFox",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FurriousFox/Foresight/issues"
+  },
+  "homepage": "https://github.com/FurriousFox/Foresight#readme"
+}
