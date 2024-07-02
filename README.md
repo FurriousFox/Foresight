@@ -1,5 +1,5 @@
 # Foresight
-A third-party integration to Habitica allowing you to look into the future and plan your dailies accordingly.
+A third-party integration to [Habitica](https://habitica.com) allowing you to look into the future and plan your dailies accordingly.
 
 ## Running Locally
 To run Foresight locally, follow these steps:
