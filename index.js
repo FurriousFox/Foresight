@@ -11,6 +11,9 @@ const server = http.createServer((req, res) => {
     } else if (req.url == "/index.js") {
         res.setHeader("Content-Type", "text/javascript");
         res.end(fs.readFileSync("bindex.js"));
+    } else if (req.url == "/icon.png") {
+        res.setHeader("Content-Type", "image/png");
+        res.end(fs.readFileSync("icon.png"));
     } else {
         res.statusCode = 404;
         res.end("Not found");
