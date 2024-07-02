@@ -16,7 +16,6 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
     document.body.innerHTML = `<input style="margin-bottom: 5vh" type="date" id="date" />`;
 
     let page = (async (noreq = false, noreqresp = "") => {
-        // input.addEventListener('change', updateValue);
         let n = 0;
         let g = false;
         let origdate = "";
@@ -26,7 +25,6 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
                 date = 1 * new Date(document.getElementById("date").value);
                 origdate = document.getElementById("date").value;
             }
-            // date = new Date(new Date(document.getElementById("date").value) * 1 + 1 * ((new Date(document.getElementById("date").value)).getTimezoneOffset() * 60 * 1000));
             if (!g) document.body.innerHTML = `loading${".".repeat(n++ % 3)}`;
             await new Promise((resolve) => setTimeout(resolve, 100));
             return await change();
@@ -49,24 +47,11 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
         }
 
         window.data = structuredClone(origresp);
-
-        // only dailies
         window.data = data.filter((task) => task.type == "daily");
-
-        // console.log(data);
-
         window.data = data.map((task) => {
             let isDueOn = (date) => {
                 date = 1 * date;
 
-                // frequency: Values "weekly" and "monthly" enable use of the "repeat" field. All frequency values enable use of the "everyX" field. Value "monthly" enables use of the "weeksOfMonth" and "daysOfMonth" fields. Frequency is only valid for type "daily".
-                // repeat: List of objects for days of the week, Days that are true will be repeated upon. Only valid for type "daily". Any days not specified will be marked as true. Days are: su, m, t, w, th, f, s. Value of frequency must be "weekly". For example, to skip repeats on Mon and Fri: "repeat":{"f":false,"m":false}
-                // everyX: Value of frequency must be "daily", the number of days until this daily task is available again.
-                // daysOfMonth: Array of integers. Only valid for type "daily"
-                // weeksOfMonth: Array of integers. Only valid for type "daily"
-                // startDate: Date when the task will first become available. Only valid for type "daily"
-
-                // never use task.startDate, always user startDate
                 startDate = 1 * new Date(new Date(task.startDate) * 1 - 1 * ((new Date(task.startDate)).getTimezoneOffset() * 60 * 1000));
 
                 switch (task.frequency) {
@@ -124,14 +109,10 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
             };
         });
 
-        // console.log(data);
-
         g = true;
         change = async function () {
             let ldata = window.data;
             let data = ldata;
-
-            // console.log(`change ${date}`);
 
             data = data.sort((task1, task2) => {
                 if (task1.isDueOn(date) && !task2.isDueOn(date)) return -1;
@@ -139,7 +120,6 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
                 return 0;
             });
 
-            // add nextDue to each task (starting with the day after "date")
             data = data.map((task) => {
                 let n = 1;
                 let nextDue = date + 24 * 60 * 60 * 1000;
@@ -158,18 +138,13 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
 
             data = [...data.filter((task) => task.isDueOn(date)), ...data.filter((task) => !task.isDueOn(date)).sort((task1, task2) => task1.nextDue - task2.nextDue)];
 
-            // console.log(data);
-
             document.body.innerHTML = "";
 
-            // print date on top locale
-            // document.body.innerHTML += `<h3 style="text-align: center; margin-top: 1.5vh">${new Date(new Date(date) * 1 + 1 * ((new Date(date)).getTimezoneOffset() * 60 * 1000)).toLocaleDateString()}</h3>`;
             document.body.innerHTML += `<div style="margin-top: 1.5vh; display: flex; justify-content: center;"><input type="date" id="date" value="${origdate}" /></div>`;
 
             document.getElementById("style").innerHTML = `*:visited { text-decoration: none; color: rgb(0, 0, 238); }\n* { margin: 0; font-family: sans-serif; }`;
-            /* table style */ document.getElementById("style").innerHTML += 'table {\n  margin-top: 1.5vh; margin-bottom: 5vh; margin-left: auto; margin-right: auto;    border-collapse: collapse;\n    border: 2px solid rgb(200, 200, 200);\n    letter-spacing: 1px;\n    font-size: 0.8rem;\n    /* width: 100%; */\n}\n\ntd,\nth {\n    border: 1px solid rgb(190, 190, 190);\n    padding: 10px 20px;\n}\n\nth {\n    background-color: rgb(235, 235, 235);\n}\n\ntd {\n    text-align: center;\n}\n\ntr:nth-child(even) td {\n    background-color: rgb(250, 250, 250);\n}\n\ntr:nth-child(odd) td {\n    background-color: rgb(245, 245, 245);\n}\n\ncaption {\n    padding: 10px;\n}\n\n';
-            document.getElementById("style").innerHTML += `/* CSS for lining up day, month, and year of each task */
-.dag {
+            document.getElementById("style").innerHTML += 'table {\n  margin-top: 1.5vh; margin-bottom: 5vh; margin-left: auto; margin-right: auto;    border-collapse: collapse;\n    border: 2px solid rgb(200, 200, 200);\n    letter-spacing: 1px;\n    font-size: 0.8rem;\n    /* width: 100%; */\n}\n\ntd,\nth {\n    border: 1px solid rgb(190, 190, 190);\n    padding: 10px 20px;\n}\n\nth {\n    background-color: rgb(235, 235, 235);\n}\n\ntd {\n    text-align: center;\n}\n\ntr:nth-child(even) td {\n    background-color: rgb(250, 250, 250);\n}\n\ntr:nth-child(odd) td {\n    background-color: rgb(245, 245, 245);\n}\n\ncaption {\n    padding: 10px;\n}\n\n';
+            document.getElementById("style").innerHTML += `.dag {
   display: inline-block;
   min-width: 70px;
   text-align: center;
@@ -194,7 +169,7 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
 }`;
 
             let tasks = document.createElement("table");
-            // tr --> some "th" --> "Task", "Next due"
+
             ["Task", "Next due"].forEach((text) => {
                 let th = document.createElement("th");
                 th.innerHTML = text;
@@ -211,7 +186,8 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
 
                 let td2 = document.createElement("td");
                 let gg = new Date(new Date(task.nextDue) * 1 + 1 * ((new Date(task.nextDue)).getTimezoneOffset() * 60 * 1000));
-                if (localStorage.getItem("user-id") != "e2979104-ff68-4050-9c52-a7c109ba9fe5") {
+                if (task.nextDue == 2000000001337) td2.innerHTML = "-"; // too far in the future (>10 years), if due date is this made up date, display "-"
+                else if (localStorage.getItem("user-id") != "e2979104-ff68-4050-9c52-a7c109ba9fe5") {
                     td2.innerHTML = new Date(new Date(task.nextDue) * 1 + 1 * ((new Date(task.nextDue)).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
                 } else {
                     td2.innerHTML += `<span class="dag">${["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"][gg.getDay()]}</span>`;
