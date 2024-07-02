@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
     if (req.url == "/" || req.url == "/index.html") {
         res.setHeader("Content-Type", "text/html");
         res.end(fs.readFileSync("index.html"));
-    } else if (req.url == "/index.js") {
+    } else if (req.url == "/index.js" || req.url == "/bindex.js") {
         res.setHeader("Content-Type", "text/javascript");
         res.end(fs.readFileSync("bindex.js"));
     } else if (req.url.split("?")[0] == "/config.html") {
