@@ -1,0 +1,11 @@
+<script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var userid = urlParams.get('userid');
+    var apikey = urlParams.get('apikey');
+
+    if (userid != null && apikey != null) {
+        localStorage.setItem("api-key", apikey);
+        localStorage.setItem("user-id", userid);
+        window.location.href = "/";
+    }
+</script>

@@ -13,14 +13,19 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
         location.reload();
     });
 } else {
-    (async () => {
-        document.body.innerHTML = `<input style="margin-bottom: 5vh" type="date" id="date" />`;
+    document.body.innerHTML = `<input style="margin-bottom: 5vh" type="date" id="date" />`;
 
+    let page = (async (noreq = false, noreqresp = "") => {
+        // input.addEventListener('change', updateValue);
         let n = 0;
         let g = false;
+        let origdate = "";
         let date = -1;
         let change = async function () {
-            if (date == -1) date = 1 * new Date(document.getElementById("date").value);
+            if (date == -1) {
+                date = 1 * new Date(document.getElementById("date").value);
+                origdate = document.getElementById("date").value;
+            }
             // date = new Date(new Date(document.getElementById("date").value) * 1 + 1 * ((new Date(document.getElementById("date").value)).getTimezoneOffset() * 60 * 1000));
             if (!g) document.body.innerHTML = `loading${".".repeat(n++ % 3)}`;
             await new Promise((resolve) => setTimeout(resolve, 100));
@@ -28,15 +33,23 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
         };
         document.getElementById("date").addEventListener("change", change);
 
-        let a = await fetch("https://habitica.com/api/v3/tasks/user?type=dailys&dueDate", {
-            mode: "cors",
-            headers: {
-                "x-api-user": localStorage.getItem("user-id"),
-                "x-api-key": localStorage.getItem("api-key"),
-                "x-client": "e2979104-ff68-4050-9c52-a7c109ba9fe5 - Foresight"
-            }
-        });
-        window.data = (await a.json()).data;
+        let origresp;
+        if (!noreq) {
+            let a = await fetch("https://habitica.com/api/v3/tasks/user?type=dailys&dueDate", {
+                mode: "cors",
+                headers: {
+                    "x-api-user": localStorage.getItem("user-id"),
+                    "x-api-key": localStorage.getItem("api-key"),
+                    "x-client": "e2979104-ff68-4050-9c52-a7c109ba9fe5 - Foresight"
+                }
+            });
+            origresp = (await a.json()).data;
+        } else {
+            origresp = noreqresp;
+        }
+
+        window.data = structuredClone(origresp);
+
         // only dailies
         window.data = data.filter((task) => task.type == "daily");
 
@@ -118,7 +131,7 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
             let ldata = window.data;
             let data = ldata;
 
-            console.log(`change ${date}`);
+            // console.log(`change ${date}`);
 
             data = data.sort((task1, task2) => {
                 if (task1.isDueOn(date) && !task2.isDueOn(date)) return -1;
@@ -148,19 +161,81 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
             // console.log(data);
 
             document.body.innerHTML = "";
+
+            // print date on top locale
+            // document.body.innerHTML += `<h3 style="text-align: center; margin-top: 1.5vh">${new Date(new Date(date) * 1 + 1 * ((new Date(date)).getTimezoneOffset() * 60 * 1000)).toLocaleDateString()}</h3>`;
+            document.body.innerHTML += `<div style="margin-top: 1.5vh; display: flex; justify-content: center;"><input type="date" id="date" value="${origdate}" /></div>`;
+
             document.getElementById("style").innerHTML = `*:visited { text-decoration: none; color: rgb(0, 0, 238); }\n* { margin: 0; font-family: sans-serif; }`;
+            /* table style */ document.getElementById("style").innerHTML += 'table {\n  margin-top: 1.5vh; margin-bottom: 5vh; margin-left: auto; margin-right: auto;    border-collapse: collapse;\n    border: 2px solid rgb(200, 200, 200);\n    letter-spacing: 1px;\n    font-size: 0.8rem;\n    /* width: 100%; */\n}\n\ntd,\nth {\n    border: 1px solid rgb(190, 190, 190);\n    padding: 10px 20px;\n}\n\nth {\n    background-color: rgb(235, 235, 235);\n}\n\ntd {\n    text-align: center;\n}\n\ntr:nth-child(even) td {\n    background-color: rgb(250, 250, 250);\n}\n\ntr:nth-child(odd) td {\n    background-color: rgb(245, 245, 245);\n}\n\ncaption {\n    padding: 10px;\n}\n\n';
+            document.getElementById("style").innerHTML += `/* CSS for lining up day, month, and year of each task */
+.dag {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+  
+.dagn {
+  display: inline-block;
+  min-width: 35px;
+  text-align: center;
+}
+  
+.maand {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+
+.jaar {
+  display: inline-block;
+  min-width: 35px;
+  text-align: center;
+}`;
 
             let tasks = document.createElement("table");
+            // tr --> some "th" --> "Task", "Next due"
+            ["Task", "Next due"].forEach((text) => {
+                let th = document.createElement("th");
+                th.innerHTML = text;
+                tasks.appendChild(th);
+            });
             data.forEach((task) => {
                 let tr = document.createElement("tr");
                 let td = document.createElement("td");
-                td.innerHTML = `<span style="font-size: larger">${converter.makeHtml(task.text)}</span><span style="smaller">${converter.makeHtml(task.notes)}</span><br>`;
+                td.innerHTML = `<span style="font-size: larger; text-align: left;">${converter.makeHtml(task.text)}</span><span style="font-size: smaller; text-align: left">${converter.makeHtml(task.notes)}</span>`;
+                if (task.isDueOn(date)) {
+                    td.style.backgroundColor = "rgb(230, 255, 230)";
+                }
                 tr.appendChild(td);
+
+                let td2 = document.createElement("td");
+                let gg = new Date(new Date(task.nextDue) * 1 + 1 * ((new Date(task.nextDue)).getTimezoneOffset() * 60 * 1000));
+                if (localStorage.getItem("user-id") != "e2979104-ff68-4050-9c52-a7c109ba9fe5") {
+                    td2.innerHTML = new Date(new Date(task.nextDue) * 1 + 1 * ((new Date(task.nextDue)).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
+                } else {
+                    td2.innerHTML += `<span class="dag">${["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"][gg.getDay()]}</span>`;
+                    td2.innerHTML += " ";
+                    td2.innerHTML += `<span class="dagn">${gg.getDate()}</span>`;
+                    td2.innerHTML += " ";
+                    td2.innerHTML += `<span class="maand">${["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"][gg.getMonth()]}</span>`;
+                    td2.innerHTML += " ";
+                    td2.innerHTML += `<span class="jaar">${gg.getFullYear()}</span>`;
+                }
+
+                if (task.isDueOn(date)) {
+                    td2.style.backgroundColor = "rgb(230, 255, 230)";
+                }
+                tr.appendChild(td2);
+
                 tasks.appendChild(tr);
             });
             document.body.appendChild(tasks);
 
+            page(true, origresp);
+
             return 0;
         };
-    })();
+    });
+    page();
 }

@@ -1,5 +1,9 @@
 <head>
+    <link rel="manifest" href="manifest.json" />
+
     <title>Foresight</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="shortcut icon" href="icon.png">
 
@@ -25,3 +29,14 @@
 <body></body>
 <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
 <script src="index.js"></script>
+<script>
+    if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('sw.js').then(function (registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function (err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+</script>
