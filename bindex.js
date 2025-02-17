@@ -64,7 +64,7 @@ if (localStorage.getItem("api-key") == null || localStorage.getItem("user-id") =
                             let dW = new Date(date);
                             dW.setDate(dW.getDate() - dW.getDay());
 
-                            if ((sW - dW - ((new Date(sW)).getTimezoneOffset() * 60 * 1000 - (new Date(dW)).getTimezoneOffset() * 60 * 1000)) % (task.everyX * 7 * 24 * 60 * 60 * 1000) == 0 || (sW - dW - ((new Date(dW)).getTimezoneOffset() * 60 * 1000 - (new Date(sW)).getTimezoneOffset() * 60 * 1000)) % (task.everyX * 7 * 24 * 60 * 60 * 1000) == 0 || (sW - dW) % (task.everyX * 7 * 24 * 60 * 60 * 1000) == 0) return Object.assign({ su: true, m: true, t: true, w: true, th: true, f: true, s: true }, task.repeat)[dayNumbToDay((new Date(date)).getDay())] && date >= startDate;
+                            if (Math.abs((sW - dW - ((new Date(sW)).getTimezoneOffset() * 60 * 1000 - (new Date(dW)).getTimezoneOffset() * 60 * 1000)) % (task.everyX * 7 * 24 * 60 * 60 * 1000)) < (1000 * 60 * 60 * 4) || Math.abs((sW - dW - ((new Date(dW)).getTimezoneOffset() * 60 * 1000 - (new Date(sW)).getTimezoneOffset() * 60 * 1000)) % (task.everyX * 7 * 24 * 60 * 60 * 1000)) < (1000 * 60 * 60 * 4) || Math.abs((sW - dW) % (task.everyX * 7 * 24 * 60 * 60 * 1000)) < (1000 * 60 * 60 * 4)) return Object.assign({ su: true, m: true, t: true, w: true, th: true, f: true, s: true }, task.repeat)[dayNumbToDay((new Date(date)).getDay())] && date >= startDate;
 
                             return false;
                         }
